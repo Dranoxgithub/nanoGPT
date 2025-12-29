@@ -1,4 +1,4 @@
-# Run this single cell in Colab
+# An implementation by Anni
 
 import math
 import torch

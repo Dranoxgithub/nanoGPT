@@ -170,7 +170,7 @@ class GPT(nn.Module):
 # ============== Test It! ==============
 config = GPTConfig(use_kv_cache=True)
 model = GPT(config)
-model.eval() # TODO: why .eval since there's @torch.no_grad() alr
+model.eval() # needed for 1. Disables dropout (dropout rate → 0). 2. BatchNorm uses running stats instead of batch stats
 
 print("Model created!")
 print(f"Config: {config}")

@@ -79,6 +79,11 @@ class CausalSelfAttention(nn.Module):
                 k = torch.cat([self.k_cache, k], dim=2)
                 v = torch.cat([self.v_cache, v], dim=2)
             
+            # detach() does TWO things:
+            # 1. Creates a tensor with NO grad_fn (no history)
+            # 2. Sets requires_grad = False
+            # Needed given if using cache with backprop - result in backward through the graph twice
+            # no big issue for typical training (not using cache) and inference (not backproping) but will be needed in RLHF & online training
             # Update cache for next iteration
             self.k_cache = k.detach()  # detach to prevent gradient accumulation
             self.v_cache = v.detach()
@@ -106,7 +111,7 @@ class CausalSelfAttention(nn.Module):
                     attn_mask=None, 
                     dropout_p=self.dropout if self.training else 0, 
                     is_causal=False  # <-- Important! Not causal when T_q=1
-                )
+                ) # TODO: understand
             else:
                 # First token or no cache - use causal mask
                 y = F.scaled_dot_product_attention(
